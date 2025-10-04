@@ -34,5 +34,5 @@ jobs:
       # Run the bot script
       - name: Run Bot Script
         run: |
-          python "Bluesky-bot/CNL-Bluesky.py"
+          python "CNL-Bluesky.py"
           echo "Bot feed refreshed"
