@@ -1,0 +1,38 @@
+name: Bot Feed Updates
+
+on: 
+  workflow_dispatch:    # allows manual run
+  schedule:
+    - cron: "*/15 * * * *"   # every 15 min
+
+jobs: 
+  feed-update: 
+    runs-on: ubuntu-latest 
+
+    steps:
+      # Checkout repo
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with: 
+          python-version: '3.11'
+
+      # Install dependencies
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      # Write Google credentials JSON
+      - name: Write service account JSON
+        run: |
+          echo "${{ secrets.GOOGLE_CREDENTIALS }}" > service_account.json
+
+      # Run the bot script
+      - name: Run Bot Script
+        run: |
+          python "my_repository/bot_template.py"
+          echo "Bot feed refreshed"
