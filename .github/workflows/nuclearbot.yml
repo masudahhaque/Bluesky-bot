@@ -1,9 +1,9 @@
 name: Bot Feed Updates
 
 on: 
-  workflow_dispatch:    # allows manual run
+  workflow_dispatch:
   schedule:
-    - cron: "*/1 * * * *"   # every 15 min
+    - cron: "*/1 * * * *"   # every minute
 
 jobs: 
   feed-update: 
@@ -26,17 +26,13 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirement.txt ]; then pip install -r requirement.txt; fi
 
-      # Write Google credentials JSON
+      # Write Google credentials JSON in the same folder as the script
       - name: Write service account JSON
         run: |
-          echo "${{ secrets.GOOGLE_CREDENTIALS }}" >  GOOGLE_CREDENTIALS.json
-
-          # GOOGLE_CREDENTIALS
-
-          #service_account
+          printf "%s" "${{ secrets.GOOGLE_CREDENTIALS }}" > Bluesky-bot/service_account.json
 
       # Run the bot script
       - name: Run Bot Script
         run: |
-          python "CNL-Bluesky.py"
+          python Bluesky-bot/CNL-Bluesky.py
           echo "Bot feed refreshed"
