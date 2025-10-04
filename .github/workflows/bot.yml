@@ -1,54 +1,38 @@
-# This workflow is used for the Communication Subproblem. 
-# It automates the bot so that its script is run every 15 minute. 
 name: Bot Feed Updates
 
-# Controls when workflow will run 
 on: 
-# Allows running this workflow manually from the Actions tab of repo
-workflow_dispatch:
-# Run is scheduled every 15 min
-schedule:
-    - cron: "*/15 * * * *"
+  workflow_dispatch:    # allows manual run
+  schedule:
+    - cron: "*/15 * * * *"   # every 15 min
 
-# A workflow run is made up of one or more JOBS
 jobs: 
-# This workflow contains a single job called "feed-update"
-feed-update: 
-# The runner that the job will run on
+  feed-update: 
     runs-on: ubuntu-latest 
 
-    # Steps represent a sequence of tasks that will be executed 
-    # as part of the job
     steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, 
-    # so your job can access it
-    - name: Checkout Repository 
+      # Checkout repo
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-    # Set up Python 
-    - name: Set up Python
+      # Set up Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with: 
-            python-version: '3.11'
+          python-version: '3.11'
 
-    # Install Python dependencies 
-    # Here, it first installs and updates pip
-    # Then finds the requirements.txt file and installs the dependencies listed
-    - name: Install Dependencies 
+      # Install dependencies
+      - name: Install Dependencies
         run: |
-        python -m pip install --upgrade pip 
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-    # Create the service_accounts.json file that stores Google API credentials 
-    # It's in the repository's secrets and not in the public repo, so it will be written to the repo now
-    - name: Write service account JSON
+      # Write Google credentials JSON
+      - name: Write service account JSON
         run: |
-            cat <<EOF > service_accounts.json
-            ${{ secrets.GOOGLE_CREDENTIALS }}
-            EOF
-            
-    # Run the bot's script 
-    - name: Run Bot Script 
+          echo "${{ secrets.GOOGLE_CREDENTIALS }}" > service_account.json
+
+      # Run the bot script
+      - name: Run Bot Script
         run: |
-        python "my_repository/bot_template.py"
-        echo "Bot feed refreshed"
+          python "my_repository/bot_template.py"
+          echo "Bot feed refreshed"
