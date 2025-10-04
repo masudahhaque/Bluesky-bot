@@ -29,7 +29,11 @@ jobs:
       # Write Google credentials JSON
       - name: Write service account JSON
         run: |
-          echo "${{ secrets.GOOGLE_CREDENTIALS }}" > service_account.json
+          echo "${{ secrets.GOOGLE_CREDENTIALS }}" >  GOOGLE_CREDENTIALS.json
+
+          # GOOGLE_CREDENTIALS
+
+          #service_account
 
       # Run the bot script
       - name: Run Bot Script
