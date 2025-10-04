@@ -3,7 +3,7 @@ name: Bot Feed Updates
 on:
   workflow_dispatch: # manual trigger
   schedule:
-    - cron: "*/5 * * * *" # runs every 5 minutes
+    - cron: "*/60 * * * *" # runs every 5 minutes
 
 jobs:
   feed-update:
