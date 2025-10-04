@@ -10,31 +10,31 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      # 1️⃣ Checkout the repository
+      # Checkout the repository
       - name: Checkout Repository
         uses: actions/checkout@v4
       
-      # 2️⃣ Set up Python
+      # Set up Python
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.13.7'
       
-      # 3️⃣ Install dependencies
+      # Install dependencies
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           pip install gspread google-auth google-auth-oauthlib google-auth-httplib2
       
-      # 4️⃣ Create secrets folder and write credentials
+      # Create secrets folder and write credentials
       - name: Write credentials files
         run: |
           mkdir -p secrets
           echo '${{ secrets.GOOGLE_CREDENTIALS }}' > service_account.json
           echo '${{ secrets.BLUESKY_CREDENTIALS }}' > secrets/credentials.json
       
-      # 5️⃣ Run the bot script
+      # Run the bot script
       - name: Run Bot Script
         run: |
           python CNL-Bluesky.py
