@@ -1,36 +1,39 @@
 name: Bot Feed Updates
 
-on: 
-  workflow_dispatch:
+on:
+  workflow_dispatch: # manual trigger
   schedule:
-    - cron: "*/1 * * * *"   # every minute
+    - cron: "*/1 * * * *" # runs every minute (fixed syntax)
 
-jobs: 
-  feed-update: 
-    runs-on: ubuntu-latest 
-
+jobs:
+  feed-update:
+    runs-on: ubuntu-latest
+    
     steps:
+      # 1️⃣ Checkout the repository
       - name: Checkout Repository
         uses: actions/checkout@v4
-
+      
+      # 2️⃣ Set up Python
       - name: Set up Python
         uses: actions/setup-python@v5
-        with: 
+        with:
           python-version: '3.13.7'
-
+      
+      # 3️⃣ Install dependencies
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirement.txt ]; then pip install -r requirement.txt; fi
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           pip install gspread google-auth google-auth-oauthlib google-auth-httplib2
-
+      
+      # 4️⃣ Write service account JSON to the correct location
       - name: Write service account JSON
         run: |
-          printf "%s" "${{ secrets.GOOGLE_CREDENTIALS }}" > service_account.json
-
-      - name: Debug - List files
-        run: ls -R
-
+          echo '${{ secrets.GOOGLE_CREDENTIALS }}' > service_account.json
+          cat service_account.json  # Debug: show the file (remove after fixing)
+      
+      # 5️⃣ Run the bot script
       - name: Run Bot Script
         run: |
           python CNL-Bluesky.py
