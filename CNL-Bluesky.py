@@ -3,6 +3,10 @@ import os
 import gspread
 from google.oauth2.service_account import Credentials
 from atproto import Client
+from geopy.geocoders import Nominatim
+from geopy.exc import GeocoderTimedOut
+
+geolocator = Nominatim(user_agent="truck-tracker") 
 
 # Define the scope
 scopes = [
@@ -59,6 +63,17 @@ print(f"📊 Found {len(data)} rows in sheet\n")
 
 posts_made = 0
 
+def get_location_from_coords(lat, lon):
+    try:
+        location = geolocator.reverse((lat, lon), language='en')
+        if location and location.address:
+            return location.address
+        else:
+            return "Unknown location"
+    except Exception as e:
+        print(f"⚠️ Geocoding error: {e}")
+        return "Unknown location"
+
 for i, row in enumerate(data):
     print(f"--- Row {i+1} ---")
     truck_id = row.get("Truck ID", "")
@@ -84,7 +99,8 @@ for i, row in enumerate(data):
     # Check if alert message contains "high radiation"
     has_high_rad = "high radiation" in str(alert_message).lower()
     print(f"  Has 'high radiation': {has_high_rad}")
-    
+
+    location_name = get_location_from_coords(latitude, longitude)
     # CASE 1: New alert (not yet posted)
     if alert_message and has_high_rad and not resolved_bool and previous_state != "alerted":
         print(f"  ➡️ POSTING NEW ALERT for Truck {truck_id}")
