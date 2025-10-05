@@ -29,7 +29,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          pip install gspread google-auth google-auth-oauthlib google-auth-httplib2 atproto
+          pip install gspread google-auth google-auth-oauthlib google-auth-httplib2 atproto geopy
       
       - name: Write credentials files
         run: |
