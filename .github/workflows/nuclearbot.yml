@@ -3,39 +3,55 @@ name: Bot Feed Updates
 on:
   workflow_dispatch: # manual trigger
   schedule:
-    - cron: "*/60 * * * *" # runs every 5 minutes
+    - cron: "*/5 * * * *" # runs every 5 minutes
 
 jobs:
   feed-update:
     runs-on: ubuntu-latest
     
     steps:
-      # Checkout the repository
+      # 1️⃣ Checkout the repository
       - name: Checkout Repository
         uses: actions/checkout@v4
       
-      # Set up Python
+      # 2️⃣ Download previous state (if exists)
+      - name: Download previous state
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: truck-state
+          path: .
+      
+      # 3️⃣ Set up Python
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.13.7'
       
-      # Install dependencies
+      # 4️⃣ Install dependencies
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           pip install gspread google-auth google-auth-oauthlib google-auth-httplib2
       
-      # Create secrets folder and write credentials
+      # 5️⃣ Create secrets folder and write credentials
       - name: Write credentials files
         run: |
           mkdir -p secrets
           echo '${{ secrets.GOOGLE_CREDENTIALS }}' > service_account.json
           echo '${{ secrets.BLUESKY_CREDENTIALS }}' > secrets/credentials.json
       
-      # Run the bot script
+      # 6️⃣ Run the bot script
       - name: Run Bot Script
         run: |
           python CNL-Bluesky.py
           echo "Bot feed refreshed"
+      
+      # 7️⃣ Upload state file for next run
+      - name: Upload state file
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: truck-state
+          path: truck_state.json
