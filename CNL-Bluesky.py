@@ -77,4 +77,4 @@ for row in data:
 
 # -------------------- SAVE UPDATED STATES --------------------
 with open("truck_state.json", "w") as f:
-    json.dump(posted_alerts, f, indent=4)
+    json.dump(last_state, f, indent=4)
