@@ -104,8 +104,8 @@ for i, row in enumerate(data):
     # CASE 1: New alert (not yet posted)
     if alert_message and has_high_rad and not resolved_bool and previous_state != "alerted":
         print(f"  ➡️ POSTING NEW ALERT for Truck {truck_id}")
-        message_en = f"🚨 ALERT: Truck #{truck_id} at ({latitude}, {longitude}) is experiencing high radiation levels."
-        message_fr = f"🚨 ALERTE : Le camion #{truck_id} à ({latitude}, {longitude}) présente un niveau élevé de radiation."
+        message_en = f"🚨 ALERT: Truck #{truck_id} at {location_name} is experiencing high radiation levels."
+        message_fr = f"🚨 ALERTE : Le camion #{truck_id} à {location_name} présente un niveau élevé de radiation."
         try:
             client.send_post(message_en)
             client.send_post(message_fr)
