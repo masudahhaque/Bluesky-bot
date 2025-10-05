@@ -29,11 +29,21 @@ client = Client()
 client.login(username, password)
 
 STATE_FILE = "truck_state.json"
-if os.path.exists(STATE_FILE):
-    with open(STATE_FILE, "r") as f:
-        last_state = json.load(f)
 
+# Load previous state with error handling
+if os.path.exists(STATE_FILE):
+    try:
+        with open(STATE_FILE, "r") as f:
+            content = f.read().strip()
+            if content:
+                last_state = json.loads(content)
+            else:
+                last_state = {}
+    except (json.JSONDecodeError, Exception) as e:
+        print(f"Warning: Could not load state file: {e}. Starting fresh.")
+        last_state = {}
 else:
+    print("No previous state found. Starting fresh.")
     last_state = {}
 
 data = sheet.get_all_records()
@@ -47,21 +57,21 @@ for row in data:
     lat = str(row.get("Latitude", "")).strip()
     lon = str(row.get("Longitude", "")).strip()
     radiation = str(row.get("Radiation Level (µSv/h)", "")).strip()
-
+    
     if not truck:
         continue
-
+    
     status = "resolved" if resolved in ["yes", "true", "resolved"] else "unresolved"
     current_state[truck] = status
     prev_status = last_state.get(truck, "")
-
+    
     # --- Case 1: New high radiation alert ---
     if "high radiation" in alert_msg and status == "unresolved":
         if prev_status != "unresolved":
             msg_en = f"🚨 Alert: Truck {truck} detected high radiation ({radiation} µSv/h) near ({lat}, {lon})."
             msg_fr = f"🚨 Alerte : Le camion {truck} a détecté un niveau de radiation élevé ({radiation} µSv/h) près de ({lat}, {lon})."
             posts_to_make.append(f"{msg_en}\n{msg_fr}")
-
+    
     # --- Case 2: Resolved alert ---
     elif status == "resolved" and prev_status == "unresolved":
         msg_en = f"✅ Update: The radiation issue for Truck {truck} has been resolved."
@@ -79,3 +89,5 @@ else:
 # === SAVE STATE ===
 with open(STATE_FILE, "w") as f:
     json.dump(current_state, f, indent=2)
+
+print(f"State saved: {current_state}")
