@@ -58,23 +58,23 @@ for row in data:
     key = str(truck_id)
 
     # CASE 1: New alert (not yet posted)
-    if alert_message and "high radiation" in alert_message.lower() and not resolved and posted_alerts.get(key) != "alerted":
+    if alert_message and "high radiation" in alert_message.lower() and not resolved and last_state.get(key) != "alerted":
         message_en = f"🚨 ALERT: Truck #{truck_id} at ({latitude}, {longitude}) is experiencing high radiation levels."
         message_fr = f"🚨 ALERTE : Le camion #{truck_id} à ({latitude}, {longitude}) présente un niveau élevé de radiation."
         client.send_post(message_en)
         client.send_post(message_fr)
-        posted_alerts[key] = "alerted"
+        last_state[key] = "alerted"
         print("Posted alert:", message_en)
 
     # CASE 2: Issue resolved (True)
-    elif resolved and posted_alerts.get(key) == "alerted":
+    elif resolved and last_state.get(key) == "alerted":
         message_en = f"✅ UPDATE: Truck #{truck_id} has resolved its high radiation issue."
         message_fr = f"✅ MISE À JOUR : Le camion #{truck_id} a résolu son problème de radiation élevée."
         client.send_post(message_en)
         client.send_post(message_fr)
-        posted_alerts[key] = "resolved"
+        last_state[key] = "resolved"
         print("Posted resolution:", message_en)
 
 # -------------------- SAVE UPDATED STATES --------------------
-with open("posted_alerts.json", "w") as f:
+with open("truck_state.json", "w") as f:
     json.dump(posted_alerts, f, indent=4)
